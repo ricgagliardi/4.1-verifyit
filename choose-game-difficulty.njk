@@ -1,0 +1,55 @@
+<main>
+	<div id="main-section">
+	</div>
+	<template id="main-template">
+		<style> 
+			body {background-color: {{ g_params.color }}}
+		</style>
+		<div class="subnav">
+			<div class="container-fluid" style="display: flex; align-items: center;">
+				<span 
+					hx-get="choose-game-topic.njk"
+					hx-target="main"
+					hx-swap="outerhtml"
+					class="material-symbols-outlined btn-back" 
+					style="cursor: pointer;">arrow_back_ios</span>
+				<h4 class="margin-auto">{{ g_params.topic | replace('-', ' ')}}</h4>
+			</div>
+		</div>
+		<div class="position-relative p-5 text-center md-align-l">
+			<h1 class="inter pb-4 md-align-l">Choose a game difficulty</h1>
+
+			<div class="d-grid gap-2 col-lg-6 mx-auto">
+				{% if g_params.mode=='single-player' %}
+					{% for d in ['easy', 'medium', 'hard'] %}
+						<button hx-get="display-question" 
+						hx-vals='{"difficulty":"{{d}}","topic":"{{params.topic}}","mode":"{{params.mode}}","color":"{{params.color}}"}'
+							hx-select="main" hx-target="main" hx-push-url="true"	
+							class="btn btn-lg grey-btn align-middle mb-3"
+							type="button"
+						>
+							<b class="fs-4">{{d | capitalize}}</b> <span class="material-symbols-outlined btn-arrow-icon">arrow_forward_ios</span>
+						</button>
+					{% endfor %}
+				{% else %}
+					{% for d in ['easy', 'medium', 'hard'] %}
+						<button hx-get="create-code"
+							hx-vals='{"difficulty":"{{d}}", "topic": "{{params.topic}}", "mode":"{{params.mode}}", "color":"{{params.color}}"}'
+							hx-select="main" hx-target="main" hx-push-url="true"
+							class="btn btn-lg grey-btn align-middle mb-2"
+							type="button"
+						>
+							<b class="fs-4">{{d | capitalize}}</b>
+							<span class="material-symbols-outlined btn-arrow-icon">arrow_forward_ios</span>
+						</button>
+					{% endfor %}
+				{% endif %} 
+			</div>
+		</div>
+	</template>
+	<script>
+		console.log('g_params', g_params)
+		htmx.find('#main-section').innerHTML = nunjucks.renderString(htmx.find('#main-template').innerHTML, {g_params})
+	</script>
+</main>
+

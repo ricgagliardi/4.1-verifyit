@@ -1,0 +1,63 @@
+<main>
+	<div class="subnav">
+		<div class="container-fluid" style="display: flex; align-items: center;">
+			<span 
+				hx-get="choose-game-mode.html"
+				hx-target="main"
+				hx-swap="outerhtml"
+				class="material-symbols-outlined btn-back" 
+				style="cursor: pointer;"
+			>arrow_back_ios
+			</span>
+			<h4 class="margin-auto" id="page-title">working on it</h4>
+
+		</div>
+	</div>
+	<div class="position-relative p-5 text-center">
+		<h1 class="inter pb-4 md-align-l">Choose a game topic</h1>
+		<div id="menu"
+		 		hx-ext="client-side-templates"
+				hx-get="https://cw8lr7eknz.g5.sqlite.cloud/v2/weblite/sql"
+				hx-vals="js:{...getParams(`
+					select topic_name, topic_color
+					from topic 
+					where status_name = 'Production' 
+					order by topic_sequence;
+				`)}"
+				hx-trigger="load"
+				hx-target="#menu"
+				hx-swap="outerHTML"
+				nunjucks-template="menu-template"
+		>
+		</div>
+	</div>
+	<template id="menu-template">
+		{% for topic in data %}
+		<div class="d-grid gap-2 col-lg-6 mx-auto">
+			<button hx-get="choose-game-difficulty.njk" 
+				onclick="g_params = {topic: '{{topic.topic_name}}', color: '#{{topic.topic_color}}', mode: g_params.mode}"
+				hx-params="none"
+				hx-target="main"
+				class="btn btn-lg align-middle mb-3" 
+				style="background-color: #{{topic.topic_color}}" type="button"
+			>
+				<b class="fs-4">{{ topic.topic_name }}</b>
+				<span class="material-symbols-outlined btn-arrow-icon">arrow_forward_ios</span>
+			</button>
+		</div>
+		{% endfor %}
+	</template>
+	<script>
+		function titleCase(str) {
+			return str.toLowerCase().split(' ').map(function(word) {
+				return word.replace(word[0], word[0].toUpperCase());
+			}).join(' ');
+		}
+
+		htmx.find('#page-title').innerHTML = titleCase(g_params.mode.replaceAll('-', ' '))
+
+		function getParams(sql) {
+			return {sql, database: 'verifyit4.db', apikey: '8EPKxzhZCotKCkO5BTVs3jBtwbHvoo9ObNwG4Pc7J5g'}
+		}
+	</script>
+</main>	

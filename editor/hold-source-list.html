@@ -1,0 +1,120 @@
+<div hx-ext="client-side-templates">
+	<table>
+		<thead>
+			<tr>
+				<th 
+							hx-get="https://cynphyadhk.g5.sqlite.cloud/v2/functions/verifyit-editor-source"
+							hx-vals="js:{...dbParams({orderby: 'name'})}"
+							hx-trigger="click"
+							hx-target="#rows"
+							hx-swap="innerHTML"
+							nunjucks-template="rows-template">
+					Source Name
+				</th>
+				<th 
+								hx-get="https://cynphyadhk.g5.sqlite.cloud/v2/functions/verifyit-editor-source"
+								hx-vals="js:{...dbParams({orderby: 'description'})}"
+								hx-trigger="click"
+								hx-target="#rows"
+								hx-swap="innerHTML"
+								nunjucks-template="rows-template">
+					Description
+				</th>
+			</tr>
+			<tr>
+				<th><input type="search" id="name" 
+							hx-get="https://cynphyadhk.g5.sqlite.cloud/v2/functions/verifyit-editor-source"
+							hx-vals="js:{...dbParams()}"
+							hx-trigger="input changed delay:500ms, keyup[key=='Enter'], load"
+							hx-target="#rows"
+							hx-swap="innerHTML"
+							nunjucks-template="rows-template">
+				</th>
+				<th><input type="search" id="description"
+							hx-get="https://cynphyadhk.g5.sqlite.cloud/v2/functions/verifyit-editor-source"
+							hx-vals="js:{...dbParams()}"
+							hx-trigger="input changed delay:500ms, keyup[key=='Enter']"
+							hx-target="#rows"
+							hx-swap="innerHTML"
+							nunjucks-template="rows-template">
+				</th>
+			</tr>
+		</thead>
+		<tbody id="rows">
+		</tbody>
+	</table>
+	<script type="text/template" id="rows-template">
+		{% for row in data.result %}
+			<tr onclick="showForm('{{ row.source_id }}')"><td>{{ row.name }}</td><td>{{ row.description | safe }}<td hidden>{{  row.source_id }}</tr>
+		{% endfor %}
+	</script>
+</div>
+
+
+
+<div>
+	<dialog id="source-form" hx-ext="client-side-templates">
+		<article style="max-width:90%">
+			<header>
+				<button aria-label="Close" rel="prev" onclick="htmx.find('#source-form').close()"></button>
+				<p>
+					<strong>Source</strong>
+				</p>
+			</header>
+			<form
+							hx-get="https://cynphyadhk.g5.sqlite.cloud/v2/functions/verifyit-editor-source"
+							hx-vals="js:{source_id: htmx.find('#source-form').source_id}"
+							hx-trigger="intersect"
+							hx-target="#fields"
+							hx-swap="innerHTML"
+							nunjucks-template="fields-template">
+				<fieldset id="fields">
+				</fieldset>
+				<input
+					type="submit"
+					value="Save and Close"
+				/>				
+			</form>
+			<footer>
+				<button onclick="htmx.find('#source-form').close()">Cancel</button>
+				<button style="background-color: red" onclick="alert('Not implemented yet.')">Delete</button>
+			</footer>
+		</article>
+		<script id="fields-template" type="text/template">
+			<label>
+				Source Name
+				<input
+				type="text"
+				name="name"
+				value = "{{ data[0].name }}"
+				/>
+			</label>
+			<label>
+				Description
+				<input type="hidden" id="raw-description" name="description" value= "{{ data[0].description }}">
+				<trix-editor input="raw-description"></trix-editor>
+			</label>
+		</script>
+</dialog>
+</div>
+<script>
+
+// function populateForm(id) {
+// 	console.log('populateForm', id)
+// }
+
+function dbParams(others) {
+	return {
+		name: '%' + htmx.find('#name').value + '%',
+		description: '%' + htmx.find('#description').value + '%',
+		...others
+	}
+}
+function showForm(id) {
+	console.log('showForm', id)
+	const fm = htmx.find('#source-form')
+	fm.source_id = id
+	fm.show()
+	console.log('check', htmx.find('#source-form').source_id)
+}
+</script>

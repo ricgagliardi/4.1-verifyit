@@ -1,0 +1,54 @@
+<!-- <main class="container"> -->
+	<form id="fmLogin" action="https://cynphyadhk.g5.sqlite.cloud/v2/functions/verifyit-editor-index" method="get">
+		<label>Full Name
+			<input type="text" name="author_name"	/>
+		</label>
+		<label>Passcode
+			<input type="password" name="passcode" />
+			<small>Get the Passcode from your Manager.</small>
+		</label>
+		<input type="submit" value="Sign in" />
+	</form>				
+<script>
+document.getElementById('fmLogin').addEventListener('submit', async function (event) {
+	event.preventDefault(); // Prevent the default form submission
+	
+	const form = event.target;
+	const formData = new FormData(form); // Collect the form data
+
+	// Serialize form data for a GET request
+	const queryParams = new URLSearchParams(formData).toString();
+	const requestUrl = `${form.action}?${queryParams}`;
+
+	try {
+		// Send the GET request to the server
+		const response = await fetch(requestUrl, {
+			method: 'GET', // Explicitly specify the GET method
+		});
+
+		if (!response.ok) {
+			throw new Error('Network response was not ok ' + response.statusText);
+		}
+
+		const jsonResponse = await response.json(); // Parse the JSON response
+		const data = jsonResponse.data
+		console.log('data', data)
+		if (data?.message) {
+			alert(data.message)
+			return
+		}
+		sessionStorage.credentials = btoa(JSON.stringify(data))
+		htmx.removeClass(htmx.find('#main-menu'), 'hidden')
+		if(data.is_manager) htmx.removeClass(htmx.find('#manager-menu'), 'hidden')
+		htmx.find('main').innerHTML = ''
+	} catch (error) {
+		console.error('There was an error with the fetch operation:', error);
+	}
+});
+function signout() {
+	delete sessionStorage.credentials
+	htmx.addClass(htmx.find('#main-menu'), 'hidden', 500)
+	htmx.removeClass(htmx.find('#manager-menu'), 'hidden', 250)
+}
+</script>
+<!-- </main> -->
